@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Book</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <header>
+        <h1>Recipe Menu</h1>
+    </header>
+
+    <div class="container">
+        <div id="homePage" role="main">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for recipes by ingredient..." aria-label="Search for recipes by ingredient">
+                <button onclick="searchRecipes()">Search</button>
+            </div>
+            <button class="view-saved-btn" onclick="viewSavedRecipes()" style="margin-left: 50%;">View Saved Recipes</button>
+            <div class="loader" id="loader" role="alert" aria-hidden="true"></div>
+
+            <div class="categories">
+                <h2>Recipe Categories</h2>
+                <div id="categoriesList" class="category-grid" role="grid">
+                    <!-- Dynamic Categories Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe Details Section -->
+        <div id="recipeDetails" class="recipe-details" aria-labelledby="recipeTitle" style="display: none;">
+            <h3 id="recipeTitle">Recipe Title</h3>
+            <img id="recipeImage" alt="Recipe Image">
+            <h4>Ingredients:</h4>
+            <ul id="recipeIngredients" role="list"></ul>
+            <h4>Preparation Method:</h4>
+            <p id="recipeInstructions"></p>
+            <button class="view-recipe-btn" onclick="hideRecipeDetails()">Back to Categories</button>
+        </div>
+
+        <div id="savedRecipes" class="recipe-details" aria-labelledby="savedRecipesTitle" style="display:none;">
+            <h3 id="savedRecipesTitle">Saved Recipes</h3>
+            <div id="savedRecipesList" role="list" class="category-grid"></div>
+            <button class="view-recipe-btn" onclick="hideSavedRecipes()">Back to Home</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
