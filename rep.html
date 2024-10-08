@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Saver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to left,purple,blueviolet,blue)
+        }
+
+        header {
+            /* background-color: #9061ff; */
+            color: rgb(255, 255, 255);
+            padding: 10px 20px;
+            text-align: center;
+            animation: loop 10s linear infinite;
+        }
+        @keyframes loop {
+            0%{background-color: black;}
+            25%{background-color: red;}
+            75%{background-color: red;}
+            100%{background-color: black;}
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            width: 300px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .search-bar button {
+            padding: 10px;
+            border: none;
+            background-color: #ff6f61;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #ff6f61;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Category Styles */
+        .categories {
+            margin-top: 20px;
+        }
+
+        .categories h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .category-item {
+            background: linear-gradient(to bottom,blue,purple)
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .category-item h3 {
+            font-size: 1.2em;
+            color: #000000;
+        }
+
+        .view-recipe-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #66312c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Recipe Details Section */
+        .recipe-details {
+            display: none;
+            background-color: antiquewhite;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            opacity: 90%;
+        }
+
+        .recipe-details h3 {
+            font-size: 1.5em;
+            color: #ff6f61;
+        }
+
+        .recipe-details img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-details ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+
+        .recipe-details p {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .search-bar input {
+                width: 100%;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .category-item h3 {
+                font-size: 1em;
+            }
+        }
+        .personal-recipe-book {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .saved-recipes-list {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .saved-recipes-list div {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Recipe Menu</h1>
+    </header>
+
+    <div class="container">
+        <div id="homePage">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for recipes by ingredient...">
+                <button onclick="searchRecipes()">Search</button>
+            </div>
+
+            <div class="loader" id="loader"></div>
+
+            <div class="categories">
+                <h2>Recipe Categories</h2>
+                <div id="categoriesList" class="category-grid">
+                </div>
+            </div>
+        </div>
+
+        <div id="recipeDetails" class="recipe-details">
+            <h3 id="recipeTitle">Recipe Title</h3>
+            <img id="recipeImage" alt="Recipe Image">
+            <h4>Ingredients:</h4>
+            <ul id="recipeIngredients"></ul>
+            <h4>Preparation Method:</h4>
+            <p id="recipeInstructions"></p>
+            <button class="view-recipe-btn" onclick="hideRecipeDetails()">Back to Categories</button>
+            <button class="view-recipe-btn" id="saveRecipeBtn" aria-label="Save this recipe">Save Recipe</button>
+        </div>
+        <div id="personalRecipeBook" class="personal-recipe-book">
+            <h2>Your Personal Recipe Book</h2>
+            <div id="savedRecipesList" class="saved-recipes-list"></div>
+            <button onclick="hidePersonalRecipeBook()" aria-label="Back to home page">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = "https://www.themealdb.com/api/json/v1/1/categories.php";
+        const mealApiUrl = "https://www.themealdb.com/api/json/v1/1/filter.php?c=";
+        const recipeDetailsApiUrl = "https://www.themealdb.com/api/json/v1/1/lookup.php?i=";
+
+        // Show loader
+        function showLoader() {
+            document.getElementById("loader").style.display = "block";
+        }
+
+        // Hide loader
+        function hideLoader() {
+            document.getElementById("loader").style.display = "none";
+        }
+
+        // Fetch categories from TheMealDB API
+        function fetchCategories() {
+            showLoader();
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    displayCategories(data.categories);
+                    hideLoader();
+                })
+                .catch(error => {
+                    console.error('Error fetching categories:', error);
+                    hideLoader();
+                });
+        }
+
+        // Display categories on the home page
+        function displayCategories(categories) {
+            const categoriesList = document.getElementById("categoriesList");
+            categoriesList.innerHTML = "";
+            categories.forEach(category => {
+                const categoryItem = document.createElement("div");
+                categoryItem.className = "category-item";
+                categoryItem.innerHTML = `
+                    <img src="${category.strCategoryThumb}" alt="${category.strCategory}">
+                    <h3>${category.strCategory}</h3>
+                    <button class="view-recipe-btn" onclick="fetchRandomRecipe('${category.strCategory}')">View Recipe</button>
+                `;
+                categoriesList.appendChild(categoryItem);
+            });
+        }
+
+        // Fetch a random recipe from a selected category
+        function fetchRandomRecipe(category) {
+            showLoader();
+            fetch(mealApiUrl + category)
+                .then(response => response.json())
+                .then(data => {
+                    const randomRecipe = data.meals[Math.floor(Math.random() * data.meals.length)];
+                    fetchRecipeDetails(randomRecipe.idMeal);
+                    hideLoader();
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe:', error);
+                    hideLoader();
+                });
+        }
+
+        // Fetch recipe details using the recipe ID
+        function fetchRecipeDetails(id) {
+            showLoader();
+            fetch(recipeDetailsApiUrl + id)
+                .then(response => response.json())
+                .then(data => {
+                    const recipe = data.meals[0];
+                    displayRecipeDetails(recipe);
+                    hideLoader();
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe details:', error);
+                    hideLoader();
+                });
+        }
+
+        //  recipe details
+        function displayRecipeDetails(recipe) {
+            document.getElementById("recipeTitle").innerText = recipe.strMeal;
+            document.getElementById("recipeImage").src = recipe.strMealThumb;
+            document.getElementById("recipeIngredients").innerHTML = '';
+
+            // List ingredients 
+            for (let i = 1; i <= 20; i++) {
+                const ingredient = recipe[`strIngredient${i}`];
+                const measure = recipe[`strMeasure${i}`];
+                if (ingredient && ingredient !== "") {
+                    const ingredientItem = document.createElement("li");
+                    ingredientItem.innerText = `${measure} ${ingredient}`;
+                    document.getElementById("recipeIngredients").appendChild(ingredientItem);
+                }
+            }
+
+            document.getElementById("recipeInstructions").innerText = recipe.strInstructions;
+
+            //  show recipe details
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("recipeDetails").style.display = "block";
+        }
+
+        //  return to categories
+        function hideRecipeDetails() {
+            document.getElementById("recipeDetails").style.display = "none";
+            document.getElementById("homePage").style.display = "block";
+        }
+
+        // Search recipes by ingredient
+        function searchRecipes() {
+            const searchInputTxt = document.getElementById("searchInput").value;
+            showLoader();
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${searchInputTxt}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.meals) {
+                        displaySearchResults(data.meals);
+                    } else {
+                        alert("No recipes found for that ingredient.");
+                    }
+                    hideLoader();
+                })
+                .catch(error => {
+                    console.error('Error fetching recipes:', error);
+                    hideLoader();
+                });
+        }
+
+        // Display search results
+        function displaySearchResults(meals) {
+            const categoriesList = document.getElementById("categoriesList");
+            categoriesList.innerHTML = ""; // Clear previous categories
+            meals.forEach(meal => {
+                const mealItem = document.createElement("div");
+                mealItem.className = "category-item";
+                mealItem.innerHTML = `
+                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                    <h3>${meal.strMeal}</h3>
+                    <button class="view-recipe-btn" onclick="fetchRecipeDetails(${meal.idMeal})">View Recipe</button>
+                `;
+                categoriesList.appendChild(mealItem);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchCategories);
+    </script>
+
+</body>
+</html>
